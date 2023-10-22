@@ -61,7 +61,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          Login | Devias Kit
+          Login | Paper Recycling Admin
         </title>
       </Head>
       <Box
@@ -86,6 +86,32 @@ const Page = () => {
               spacing={1}
               sx={{ mb: 3 }}
             >
+              <Typography
+                align="center"
+                color="inherit"
+                sx={{
+                  fontSize: '24px',
+                  lineHeight: '32px',
+                  mb: 1
+                }}
+                variant="h1"
+              >
+                Welcome to{' '}
+                <Box
+                  component="a"
+                  sx={{ color: '#15B79E' }}
+                  target="_blank"
+                >
+                  Paper Recycling Admin
+                </Box>
+              </Typography>
+              <Typography
+                align="center"
+                sx={{ mb: 3 }}
+                variant="subtitle1"
+              >
+                A system to manage collection and recycling of materials.
+              </Typography>
               <Typography variant="h4">
                 Login
               </Typography>

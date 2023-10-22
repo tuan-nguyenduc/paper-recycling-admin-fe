@@ -16,9 +16,12 @@ import {
   ListItemText,
   SvgIcon
 } from '@mui/material';
+import moment from "moment";
+import { useRouter } from 'next/router';
 
 export const OverviewLatestProducts = (props) => {
   const { products = [], sx } = props;
+  const router = useRouter();
 
   return (
     <Card sx={sx}>
@@ -26,7 +29,7 @@ export const OverviewLatestProducts = (props) => {
       <List>
         {products.map((product, index) => {
           const hasDivider = index < products.length - 1;
-          const ago = formatDistanceToNow(product.updatedAt);
+          const ago = moment(product.updatedAt, "YYYY-MM-DDTHH:mm:ss.sssZ").fromNow();
 
           return (
             <ListItem
@@ -35,11 +38,11 @@ export const OverviewLatestProducts = (props) => {
             >
               <ListItemAvatar>
                 {
-                  product.image
+                  product.images
                     ? (
                       <Box
                         component="img"
-                        src={product.image}
+                        src={product.images.split(",")[0]}
                         sx={{
                           borderRadius: 1,
                           height: 48,
@@ -62,7 +65,7 @@ export const OverviewLatestProducts = (props) => {
               <ListItemText
                 primary={product.name}
                 primaryTypographyProps={{ variant: 'subtitle1' }}
-                secondary={`Updated ${ago} ago`}
+                secondary={`Updated ${ago}`}
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
               <IconButton edge="end">
@@ -85,6 +88,7 @@ export const OverviewLatestProducts = (props) => {
           )}
           size="small"
           variant="text"
+          onClick={() => router.push('/products')}
         >
           View all
         </Button>

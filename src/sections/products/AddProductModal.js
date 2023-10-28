@@ -228,7 +228,7 @@ const AddProductModal = ({ editData, open, setOpen, reloadProducts }) => {
                 label="Description"
               >
                 <Input.TextArea placeholder="Product description"
-                                rows={3}/>
+                                rows={6}/>
               </Form.Item>
             </Col>
           </Row>

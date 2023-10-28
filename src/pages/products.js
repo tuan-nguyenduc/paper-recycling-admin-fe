@@ -143,7 +143,10 @@ const Page = () => {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      width: 250
+      width: 250,
+      render: (description) => {
+        return <div>{description?.length > 200 ? description?.substring(0, 100) + "..." : description}</div>;
+      }
     },
     {
       title: 'Created at',

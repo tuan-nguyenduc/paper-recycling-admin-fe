@@ -31,3 +31,11 @@ export const formatPaperCollectStatus = (status) => {
     case -1: return 'CANCELLED'
   }
 }
+
+export const formatCampaignStatus = (status) => {
+  switch (status) {
+    case 1: return 'ONGOING'
+    case 2: return 'COMPLETED'
+    case -1: return 'CANCELLED'
+  }
+}

@@ -7,6 +7,7 @@ import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { IoSchoolSharp } from 'react-icons/io5';
 import { FaHistory } from 'react-icons/fa';
+import { MdCampaign } from 'react-icons/md';
 
 export const items = [
   {
@@ -70,6 +71,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <IoSchoolSharp/>
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Campaigns',
+    path: '/campaigns',
+    icon: (
+      <SvgIcon fontSize="medium">
+        <MdCampaign/>
       </SvgIcon>
     )
   },

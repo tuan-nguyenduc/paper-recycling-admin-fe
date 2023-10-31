@@ -6,7 +6,7 @@ import { IoIosSchool } from 'react-icons/io';
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { IoSchoolSharp } from 'react-icons/io5';
-import { FaHistory } from 'react-icons/fa';
+import { FaExchangeAlt, FaHistory } from 'react-icons/fa';
 import { MdCampaign } from 'react-icons/md';
 
 export const items = [
@@ -80,6 +80,24 @@ export const items = [
     icon: (
       <SvgIcon fontSize="medium">
         <MdCampaign/>
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Exchange Materials',
+    path: '/exchange-materials',
+    icon: (
+      <SvgIcon fontSize="small">
+        <FaExchangeAlt/>
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Material Collect Histories',
+    path: '/material-collect-histories',
+    icon: (
+      <SvgIcon fontSize="small">
+        <FaHistory/>
       </SvgIcon>
     )
   },

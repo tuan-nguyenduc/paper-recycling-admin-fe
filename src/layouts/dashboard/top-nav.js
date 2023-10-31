@@ -29,7 +29,7 @@ export const TopNav = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const accountPopover = usePopover();
   const auth = useAuth();
-
+    console.log(auth.user)
   return (
     <>
       <Box

@@ -1,4 +1,6 @@
 import axiosClient from './axiosClient';
+import AddOrEditExchangeMaterialModal
+  from '../sections/exchange-materials/AddOrEditExchangeMaterialModal';
 
 const paperRecyclingApis = {
   login: async (data) => {
@@ -147,14 +149,51 @@ const paperRecyclingApis = {
     const url = `/posts/${id}`;
     return await axiosClient.delete(url);
   },
-  getAllExchangeReward: async (params = {}) => {
-    const url = '/posts';
+  confirmCampaign: async (id) => {
+    const url = `/posts/${id}/confirm`;
+    return await axiosClient.post(url);
+  },
+  getAllExchangeMaterial: async (params = {}) => {
+    const url = '/exchange-rewards';
     return await axiosClient.get(url, { params });
   },
-  createExchangeReward: async (data) => {
-    const url = '/posts';
+  getExchangeMaterialById: async (id, params = {}) => {
+    const url = `/exchange-rewards/${id}`;
+    return await axiosClient.get(url, { params });
+  },
+  createExchangeMaterial: async (data) => {
+    const url = '/exchange-rewards';
     return await axiosClient.post(url, data);
-  }
+  },
+  updateExchangeMaterial: async (id, data) => {
+    const url = `/exchange-rewards/${id}`;
+    return await axiosClient.put(url, data);
+  },
+  deleteExchangeMaterial: async (id) => {
+    const url = `/exchange-rewards/${id}`;
+    return await axiosClient.delete(url);
+  },
+  allMaterialCollectHistories: async (params = {}) => {
+    const url = '/material-collect-histories';
+    return await axiosClient.get(url, { params });
+  },
+  createCollectMaterial: async (data) => {
+    const url = '/material-collect-histories';
+    return await axiosClient.post(url, data);
+  },
+  confirmCollectMaterial: async (id) => {
+    const url = `/material-collect-histories/${id}/confirm`;
+    return await axiosClient.post(url);
+  },
+  cancelCollectMaterial: async (id) => {
+    const url = `/material-collect-histories/${id}/cancel`;
+    return await axiosClient.post(url);
+  },
+  updateCollectMaterial: async (id, data) => {
+    const url = `/material-collect-histories/${id}`;
+    return await axiosClient.put(url, data);
+  },
+
 };
 
 export default paperRecyclingApis;

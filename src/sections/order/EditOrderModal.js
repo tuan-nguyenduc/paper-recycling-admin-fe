@@ -105,7 +105,7 @@ const EditOrderModal = ({open, setOpen, reloadOrders, editData}) => {
                         return (<>
                             <div style={{margin: 20, backgroundColor: '#FAFAFA', borderRadius: 20}}
                                  key={orderItem.id}>
-                                <img src={orderItem.product.images} alt={orderItem.product.name}
+                                <img src={orderItem.product.images.split(',')[0]} alt={orderItem.product.name}
                                      width={70} height={70}/>
                                 <p
                                     style={{

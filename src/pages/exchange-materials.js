@@ -20,60 +20,44 @@ import AddProductModal from '../sections/products/AddProductModal';
 import { useQuery } from 'react-query';
 import paperRecyclingApis from '../services/paperRecyclingApis';
 import { useMemo, useState } from 'react';
-import { AiOutlineEdit, AiOutlineEye } from 'react-icons/ai';
-import { BsEyeFill, BsFillCheckCircleFill, BsFillTrashFill } from 'react-icons/bs';
-import AddOrEditCategoryModal from '../sections/categories/AddOrEditCategoryModal';
+import { AiOutlineEdit } from 'react-icons/ai';
+import { BsFillTrashFill } from 'react-icons/bs';
+// import AddOrEditCategoryModal from '../sections/categories/AddOrEditCategoryModal';
 import toast from 'react-hot-toast';
 import { post } from 'axios';
-import AddOrEditCampaignModal from '../sections/campaigns/AddOrEditCampaignModal';
-import { campaignStatus } from '../constants';
-import { formatCampaignStatus } from '../utils';
-import { ref } from 'yup';
+import AddOrEditExchangeMaterialModal
+  from '../sections/exchange-materials/AddOrEditExchangeMaterialModal';
+// import AddOrEditExchangeMaterialModal from '../sections/ExchangeMaterials/AddOrEditExchangeMaterialModal';
+// import {ExchangeMaterialStatus} from "../constants";
+// import {formatExchangeMaterialStatus} from "../utils";
 
-const Campaigns = () => {
+const ExchangeMaterials = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [toEdit, setToEdit] = useState(null);
   const {
-    data: campaignsData = {},
-    isLoading: isLoadingCampaigns,
-    refetch: refetchCampaigns
-  } = useQuery(['paperRecyclingApis.allPosts'], () => paperRecyclingApis.getAllCampaigns());
-
-  const { data: { contents: campaigns = [] } = {} } = campaignsData;
+    data: materialsData = {},
+    isLoading: isLoadingMaterials,
+    refetch: refetchMaterials
+  } = useQuery(['exchangeMaterials'], () => paperRecyclingApis.getAllExchangeMaterial());
+  const { data: {contents: materials = []} = {} } = materialsData;
   const tableData = useMemo(() => {
-    return campaigns.map((campaign) => ({
-      ...campaign,
-      key: campaign.id,
-      statusName: formatCampaignStatus(campaign.status)
+    return materials.map((material) => ({
+      ...material,
+      key: material.id,
+      campaign: material?.post?.name,
     }));
-  }, [campaigns]);
-  const onDeleteCampaign = async (id) => {
+  }, [materials]);
+
+  console.log(materials);
+  const onDeleteMaterials = async (id) => {
     try {
-      await paperRecyclingApis.deleteCampaign(id);
-      await refetchCampaigns();
-      toast.success('Delete campaign successfully');
+      await paperRecyclingApis.deleteExchangeMaterial(id);
+      await refetchMaterials();
+      toast.success('Delete material successfully');
     } catch (err) {
-      toast.error('Delete campaign failed: ' + err.message);
+      toast.error('Delete material failed: ' + err.message);
     }
   };
-
-  const handleFinishCampaign = async (id) => {
-    try {
-      return await paperRecyclingApis.confirmCampaign(id);
-    } catch (e) {
-      throw new Error(e.message);
-    } finally {
-      await refetchCampaigns();
-    }
-  };
-  const handleSubmitFinish = (id) => {
-    toast.promise(handleFinishCampaign(id), {
-      success: () => 'Finish campaign Successfully!',
-      loading: () => 'Finishing campaign...',
-      error: (err) => `${err.message}`
-    });
-  };
-
   const columns = useMemo(() => {
     return [
       {
@@ -82,9 +66,20 @@ const Campaigns = () => {
         key: 'id'
       },
       {
+        title: 'Campaign',
+        dataIndex: 'campaign',
+        key: 'campaign'
+      },
+      {
         title: 'Name',
-        dataIndex: 'name',
+        dataIndex: 'material',
         key: 'name'
+      },
+      {
+        title: 'Reward',
+        dataIndex: 'reward',
+        key: 'reward',
+        width: '10%'
       },
       {
         title: 'Image',
@@ -95,7 +90,7 @@ const Campaigns = () => {
             const imagesArr = images?.split(',')?.filter((item) => !!item);
             if (imagesArr.length > 0) {
               return (
-                <Image src={imagesArr[0]} alt="campaign image" width={70}/>
+                <Image src={imagesArr[0]} alt="exchange material image" width={70}/>
               );
             }
           }
@@ -107,15 +102,8 @@ const Campaigns = () => {
         dataIndex: 'description',
         key: 'description',
         render: (description) => {
-          return <div>{description?.length > 200
-            ? description?.substring(0, 100) + '...'
-            : description}</div>;
+          return <div>{description?.length > 200 ? description?.substring(0, 100) + "..." : description}</div>;
         }
-      },
-      {
-        title: 'Status',
-        dataIndex: 'statusName',
-        key: 'statusName'
       },
       {
         title: 'Action',
@@ -123,45 +111,25 @@ const Campaigns = () => {
         key: 'action',
         render: (text, record) => (
           <Stack direction="row" spacing={1}>
-            {record.status === 1
-              ? <>
-                <AntdButton onClick={() => {
-                  setToEdit(record);
-                  setOpenAddModal(true);
-                }}>
-                  <AiOutlineEdit/>
-                </AntdButton>
-                <Popconfirm
-                  title="Finish Campaign"
-                  description="Are you sure to finish this campaign?"
-                  onConfirm={async () => {
-                    await handleSubmitFinish(record.id);
-
-                  }}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <AntdButton style={{ borderColor: 'green' }} onClick={() => {
-                  }}>
-                    <BsFillCheckCircleFill color="green" size={16}/>
-                  </AntdButton>
-                </Popconfirm>
-                <Popconfirm
-                  title="Delete campaign"
-                  description="Are you sure to delete this campaign?"
-                  onConfirm={async () => {
-                    await onDeleteCampaign(record.id);
-                  }}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <AntdButton danger>
-                    <BsFillTrashFill/>
-                  </AntdButton>
-                </Popconfirm>
-              </> : <AntdButton >
-                <BsEyeFill size={18}/>
-              </AntdButton>}
+            <AntdButton onClick={() => {
+              setToEdit(record);
+              setOpenAddModal(true);
+            }}>
+              <AiOutlineEdit/>
+            </AntdButton>
+            <Popconfirm
+              title="Delete material"
+              description="Are you sure to delete this material?"
+              onConfirm={async () => {
+                await onDeleteMaterials(record.id);
+              }}
+              okText="Yes"
+              cancelText="No"
+            >
+              <AntdButton danger>
+                <BsFillTrashFill/>
+              </AntdButton>
+            </Popconfirm>
 
           </Stack>
         )
@@ -172,7 +140,7 @@ const Campaigns = () => {
     <>
       <Head>
         <title>
-          Campaigns | Paper Recycling
+          Exchange Materials | Paper Recycling
         </title>
       </Head>
 
@@ -192,7 +160,7 @@ const Campaigns = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Campaigns
+                  Exchange Materials
                 </Typography>
                 <Stack
                   alignItems="center"
@@ -242,7 +210,7 @@ const Campaigns = () => {
               <OutlinedInput
                 defaultValue=""
                 fullWidth
-                placeholder="Search campaigns"
+                placeholder="Search Exchange Materials"
                 startAdornment={(
                   <InputAdornment position="start">
                     <SvgIcon
@@ -289,20 +257,20 @@ const Campaigns = () => {
           </Stack>
         </Container>
       </Box>
-      <AddOrEditCampaignModal
+      <AddOrEditExchangeMaterialModal
         open={openAddModal}
         setOpen={setOpenAddModal}
-        onSave={refetchCampaigns}
+        onSave={refetchMaterials}
         editData={toEdit}
-        reloadCampaign={refetchCampaigns}
+        reloadExchangeMaterial={refetchMaterials}
       />
     </>
   );
 };
-Campaigns.getLayout = (page) => (
+ExchangeMaterials.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
 
-export default Campaigns;
+export default ExchangeMaterials;

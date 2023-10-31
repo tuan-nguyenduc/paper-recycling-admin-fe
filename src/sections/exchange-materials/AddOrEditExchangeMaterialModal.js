@@ -1,4 +1,14 @@
-import {Form, Input, Modal, Button as AntdButton, Upload, Image, Button} from 'antd';
+import {
+  Form,
+  Input,
+  Modal,
+  Button as AntdButton,
+  Upload,
+  Image,
+  Button,
+  Select,
+  InputNumber
+} from 'antd';
 import toast from 'react-hot-toast';
 import {useEffect, useState} from 'react';
 import paperRecyclingApis from '../../services/paperRecyclingApis';
@@ -7,6 +17,8 @@ import {AiOutlineCloudUpload} from 'react-icons/ai';
 import ImgCrop from 'antd-img-crop';
 import {useAuth} from '../../hooks/use-auth';
 import {BsPlusLg} from 'react-icons/bs';
+import { useQuery } from 'react-query';
+import { width } from '@mui/system';
 
 const ALLOWED_TYPES = [
     'image/png',
@@ -15,17 +27,26 @@ const ALLOWED_TYPES = [
     'image/webp',
     'image/svg+xml'
 ];
-const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign}) => {
+const AddOrEditExchangeMaterialModal = ({open, setOpen, onSave, editData, reloadExchangeMaterial}) => {
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
     const [files, setFiles] = useState(null);
     const [images, setImages] = useState(null);
+    const [postId, setPostId] = useState(null);
     const auth = useAuth();
-    const saveOrUpdateCampaign = async (data) => {
+    console.log(editData)
+  const {
+    data: campaignsData = {},
+    isLoading: isLoadingCampaigns,
+    refetch: refetchCampaigns
+  } = useQuery(['paperRecyclingApis.allPosts'], () => paperRecyclingApis.getAllCampaigns());
+
+  const { data: {contents: campaigns = []} = {} } = campaignsData;
+    const saveOrUpdateExchangeMaterial = async (data) => {
         try {
             setLoading(true);
             if (!images.length) {
-                throw new Error('Please add campaign banners');
+                throw new Error('Please add material images');
             }
             //upload images
             const uploadImages = await Promise.all(files.map(async (file) => {
@@ -42,19 +63,21 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
             const oldImagesUrls = oldImages.map((item) => item.url);
             const toSendImages = [...validUploadImages, ...oldImagesUrls];
 
-            const newCampaign = {
-                name: data.name,
+            const newExchangeMaterial = {
+                material: data.material,
                 description: data.description,
+                reward: data.reward,
                 images: toSendImages.join(','),
-                schoolId: auth?.user?.schoolId
+                postId: data.campaign,
             };
+          console.log(newExchangeMaterial);
             let resp;
             if (editData) {
-                resp = await paperRecyclingApis.updateCampaign(editData.id, newCampaign);
+                resp = await paperRecyclingApis.updateExchangeMaterial(editData.id, newExchangeMaterial);
             } else {
-                resp = await paperRecyclingApis.createCampaign(newCampaign);
+                resp = await paperRecyclingApis.createExchangeMaterial(newExchangeMaterial);
             }
-            await reloadCampaign();
+            await reloadExchangeMaterial();
             form.resetFields();
             setFiles([]);
             setImages([]);
@@ -67,10 +90,10 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
         }
     };
     const onFinish = (values) => {
-        toast.promise(saveOrUpdateCampaign(values), {
-            loading: 'Saving Campaign...',
-            success: 'Saved campaign successfully',
-            error: err => 'Save campaign failed: ' + err.message
+        toast.promise(saveOrUpdateExchangeMaterial(values), {
+            loading: 'Saving material...',
+            success: 'Saved material successfully',
+            error: err => 'Save material failed: ' + err.message
         });
     };
 
@@ -127,7 +150,7 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
 
     return (
         <Modal
-            title={editData ? "Edit Campaign" :"Add Campaign"}
+            title={editData ? "Edit Exchange Material" : "Add Exchange Material"}
             open={open}
             onOk={() => setOpen(false)}
             onCancel={() => setOpen(false)}
@@ -144,21 +167,46 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
             <Form
                 onFinish={onFinish}
                 layout="vertical"
-                name="Campaign"
+                name="Exchange Material"
                 form={form}
             >
+              <Form.Item
+                name="campaign"
+                label="Campaign"
+                rules={[{required: true, message: 'Please enter your campaign'}]}
+              >
+                <Select
+                  placeholder="Select campaign"
+                  options={campaigns?.map(campaign => {
+                    return {
+                      value: campaign?.id,
+                      label: campaign?.name
+                    }
+                  })}
+                  onChange={(value) => {
+                    setPostId(value);
+                  }}
+                />
+              </Form.Item>
                 <Form.Item
-                    name="name"
+                    name="material"
                     label="Name"
-                    rules={[{required: true, message: 'Please enter campaign name'}]}
+                    rules={[{required: true, message: 'Please enter material name'}]}
                 >
-                    <Input placeholder="Campaign name"/>
+                    <Input placeholder="Material name"/>
                 </Form.Item>
+              <Form.Item
+                name="reward"
+                label="Reward"
+                rules={[{required: true, message: 'Please enter reward each KG'}]}
+              >
+                <InputNumber placeholder="Reward"/>
+              </Form.Item>
                 <Form.Item
                     name="description"
                     label="Description"
                 >
-                    <Input.TextArea spellCheck={false} placeholder="Description" rows={6}/>
+                    <Input.TextArea spellCheck={false} placeholder="Description" rows={2}/>
                 </Form.Item>
                 <Form.Item
                     label="Images"
@@ -167,7 +215,7 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
                     <ImgCrop
                         showReset={true}
                         //crop to square
-                        aspect={2}
+                        aspect={1}
                     >
                         <Upload
                             listType="picture-card"
@@ -189,4 +237,4 @@ const AddOrEditCampaignModal = ({open, setOpen, onSave, editData, reloadCampaign
     );
 };
 
-export default AddOrEditCampaignModal;
+export default AddOrEditExchangeMaterialModal;

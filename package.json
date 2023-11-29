@@ -7,6 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next",
+    "test": "jest",
     "build": "next build",
     "start": "next start",
     "export": "next export",
@@ -53,6 +54,14 @@
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
     "eslint": "8.34.0",
-    "eslint-config-next": "13.1.6"
+    "eslint-config-next": "13.1.6",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

@@ -1,5 +1,5 @@
 // Remote URL
-export const API_URL = 'https://auth-api-demo.click/';
+export const API_URL = 'https://auth-api-demo.click/api/v1';
 
 // Local URL
 // export const API_URL = 'http://localhost:3000/api/v1/';

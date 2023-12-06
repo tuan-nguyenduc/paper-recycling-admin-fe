@@ -17,7 +17,7 @@ import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { Scrollbar } from '../components/scrollbar';
 import { Button as AntdButton, Pagination, Popconfirm, Select, Table } from 'antd';
 import AddOrEditSchoolModal from '../sections/schools/AddOrEditSchoolModal';
-import { useMemo, useState } from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import AddClassesModal from '../sections/classes/AddClassesModal';
 import { useQuery } from 'react-query';
 import paperRecyclingApis from '../services/paperRecyclingApis';
@@ -26,12 +26,14 @@ import {BsFillShareFill, BsFillTrashFill} from 'react-icons/bs';
 import EditClassModal from '../sections/classes/EditClassModal';
 import {formatPrice} from "../utils";
 import DistributeRewardModal from "../sections/classes/DistributeRewardModal";
+import _debounce from "lodash/debounce";
 
 const ClassesManagement = () => {
   const [dataSearch, setDataSearch] = useState({
     page: 0,
     limit: 10,
-    schoolId: null
+    schoolId: null,
+    q: ""
   });
   const [toEdit, setToEdit] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -61,9 +63,9 @@ const ClassesManagement = () => {
       key: 'id'
     },
     {
-      title: 'School',
-      dataIndex: 'schoolName',
-      key: 'school'
+      title: 'Class name',
+      dataIndex: 'name',
+      key: 'name'
     },
     {
       title: 'Grade',
@@ -72,30 +74,31 @@ const ClassesManagement = () => {
       width: 80
     },
     {
-      title: 'Class name',
-      dataIndex: 'name',
-      key: 'name'
+      title: 'School',
+      dataIndex: 'schoolName',
+      key: 'school'
     },
     {
       title: 'Total students',
       dataIndex: 'totalStudent',
       key: 'totalStudent',
-      width: 100
+      width: '10%'
     },
     {
       title: 'Paper Point Reward',
       dataIndex: 'rewardPaperPoint',
+      width: '15%',
       key: 'rewardPaperPoint',
       render: (amount) => {
         return <div>{formatPrice(amount)} PP</div>
       }
     },
-    {
-      title: 'Next Class Id',
-      dataIndex: 'nextClassId',
-      key: 'nextClassId',
-      width: 100
-    },
+    // {
+    //   title: 'Next Class Id',
+    //   dataIndex: 'nextClassId',
+    //   key: 'nextClassId',
+    //   width: 100
+    // },
     {
       title: 'Action',
       dataIndex: 'action',
@@ -142,6 +145,14 @@ const ClassesManagement = () => {
     }));
     return tableData;
   }), [classes]);
+
+  const handeSearchDebounce = (value) => {
+    setDataSearch({
+      ...dataSearch,
+      q: value
+    });
+  };
+  const debounceFn = useCallback(_debounce(handeSearchDebounce, 500), [dataSearch]);
   return (
     <>
       <Head>
@@ -211,7 +222,31 @@ const ClassesManagement = () => {
                 </Button>
               </div>
             </Stack>
-            <Card sx={{ p: 2 }}>
+            <Card style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 16px'
+            }}>
+              <OutlinedInput
+                  defaultValue=""
+                  fullWidth
+                  placeholder="Search classes"
+                  onChange={(e) => {
+                    debounceFn(e.target.value);
+                  }}
+                  startAdornment={(
+                      <InputAdornment position="start">
+                        <SvgIcon
+                            color="action"
+                            fontSize="small"
+                        >
+                          <MagnifyingGlassIcon/>
+                        </SvgIcon>
+                      </InputAdornment>
+                  )}
+                  sx={{ maxWidth: 500 }}
+              />
               <Select style={{ width: 350 }} size="large" allowClear onChange={(value) => {
                 setDataSearch({
                   ...dataSearch,

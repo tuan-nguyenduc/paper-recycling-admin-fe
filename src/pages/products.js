@@ -84,13 +84,13 @@ const Page = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 70
+      width: '5%'
     },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: 150,
+      width: '20%',
       sorter: true,
       sortDirections: ['ascend', 'descend', 'ascend']
     },
@@ -152,7 +152,7 @@ const Page = () => {
       title: 'Created at',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 80,
+      width: '10%',
       sorter: true,
       sortDirections: ['ascend', 'descend', 'ascend']
     },

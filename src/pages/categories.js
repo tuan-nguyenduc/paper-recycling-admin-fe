@@ -19,20 +19,26 @@ import { Button as AntdButton, Image, Pagination, Popconfirm, Table } from 'antd
 import AddProductModal from '../sections/products/AddProductModal';
 import { useQuery } from 'react-query';
 import paperRecyclingApis from '../services/paperRecyclingApis';
-import { useMemo, useState } from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsFillTrashFill } from 'react-icons/bs';
 import AddOrEditCategoryModal from '../sections/categories/AddOrEditCategoryModal';
 import toast from 'react-hot-toast';
+import _debounce from "lodash/debounce";
 
 const Categories = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [toEdit, setToEdit] = useState(null);
+    const [dataSearch, setDataSearch] = useState({
+        page: 0,
+        limit: 10,
+        q: '',
+    });
   const {
     data: categoriesData = {},
     isLoading: isLoadingCategories,
     refetch: refetchCategories
-  } = useQuery(['paperRecyclingApis.allCategories'], () => paperRecyclingApis.allCategories());
+  } = useQuery(['paperRecyclingApis.allCategories', dataSearch], ({queryKey}) => paperRecyclingApis.allCategories(queryKey[1]));
 
   const { data: categories = [] } = categoriesData;
   const tableData = useMemo(() => {
@@ -45,9 +51,9 @@ const Categories = () => {
     try {
       await paperRecyclingApis.deleteCategory(id);
       await refetchCategories();
-      toast.success('Action success');
+      toast.success('Delete category success');
     } catch (err) {
-      toast.error('Action failed: ' + err.message);
+      toast.error('Delete category failed: ' + err.message);
     }
   };
   const columns = useMemo(() => {
@@ -109,6 +115,14 @@ const Categories = () => {
       }
     ];
   }, []);
+
+  const handeSearchDebounce = (value) => {
+    setDataSearch({
+      ...dataSearch,
+      q: value
+    });
+  };
+  const debounceFn = useCallback(_debounce(handeSearchDebounce, 500), [dataSearch]);
   return (
     <>
       <Head>
@@ -184,6 +198,9 @@ const Categories = () => {
                 defaultValue=""
                 fullWidth
                 placeholder="Search categories"
+                onChange={(e) => {
+                  debounceFn(e.target.value);
+                }}
                 startAdornment={(
                   <InputAdornment position="start">
                     <SvgIcon

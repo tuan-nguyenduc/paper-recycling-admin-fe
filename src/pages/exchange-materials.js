@@ -15,11 +15,11 @@ import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIc
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { Scrollbar } from '../components/scrollbar';
-import { Button as AntdButton, Image, Pagination, Popconfirm, Table } from 'antd';
+import {Button as AntdButton, Image, Pagination, Popconfirm, Select, Table} from 'antd';
 import AddProductModal from '../sections/products/AddProductModal';
 import { useQuery } from 'react-query';
 import paperRecyclingApis from '../services/paperRecyclingApis';
-import { useMemo, useState } from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { BsFillTrashFill } from 'react-icons/bs';
 // import AddOrEditCategoryModal from '../sections/categories/AddOrEditCategoryModal';
@@ -27,6 +27,8 @@ import toast from 'react-hot-toast';
 import { post } from 'axios';
 import AddOrEditExchangeMaterialModal
   from '../sections/exchange-materials/AddOrEditExchangeMaterialModal';
+import _debounce from "lodash/debounce";
+import {campaignStatus} from "../constants";
 // import AddOrEditExchangeMaterialModal from '../sections/ExchangeMaterials/AddOrEditExchangeMaterialModal';
 // import {ExchangeMaterialStatus} from "../constants";
 // import {formatExchangeMaterialStatus} from "../utils";
@@ -34,11 +36,16 @@ import AddOrEditExchangeMaterialModal
 const ExchangeMaterials = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [toEdit, setToEdit] = useState(null);
+  const [dataSearch, setDataSearch] = useState({
+    page: 0,
+    limit: 10,
+    q: '',
+  });
   const {
     data: materialsData = {},
     isLoading: isLoadingMaterials,
     refetch: refetchMaterials
-  } = useQuery(['exchangeMaterials'], () => paperRecyclingApis.getAllExchangeMaterial());
+  } = useQuery(['exchangeMaterials', dataSearch], ({queryKey}) => paperRecyclingApis.getAllExchangeMaterial(queryKey[1]));
   const { data: {contents: materials = []} = {} } = materialsData;
   const tableData = useMemo(() => {
     return materials.map((material) => ({
@@ -48,7 +55,14 @@ const ExchangeMaterials = () => {
     }));
   }, [materials]);
 
-  console.log(materials);
+  const {
+    data: campaignsData = {},
+    isLoading: isLoadingCampaigns
+  } = useQuery(['paperRecyclingApis.allCampaigns'], () => paperRecyclingApis.getAllCampaigns({
+    status: 1
+  }));
+  const {data: {contents: campaigns = []} = {} } = campaignsData;
+
   const onDeleteMaterials = async (id) => {
     try {
       await paperRecyclingApis.deleteExchangeMaterial(id);
@@ -66,14 +80,14 @@ const ExchangeMaterials = () => {
         key: 'id'
       },
       {
-        title: 'Campaign',
-        dataIndex: 'campaign',
-        key: 'campaign'
-      },
-      {
         title: 'Name',
         dataIndex: 'material',
         key: 'name'
+      },
+      {
+        title: 'Campaign',
+        dataIndex: 'campaign',
+        key: 'campaign'
       },
       {
         title: 'Reward',
@@ -136,6 +150,15 @@ const ExchangeMaterials = () => {
       }
     ];
   }, []);
+
+  const handeSearchDebounce = (value) => {
+    setDataSearch({
+      ...dataSearch,
+      q: value
+    });
+  };
+  const debounceFn = useCallback(_debounce(handeSearchDebounce, 500), [dataSearch]);
+
   return (
     <>
       <Head>
@@ -206,11 +229,19 @@ const ExchangeMaterials = () => {
                 </Button>
               </div>
             </Stack>
-            <Card sx={{ p: 2 }}>
+            <Card style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 16px'
+            }}>
               <OutlinedInput
                 defaultValue=""
                 fullWidth
                 placeholder="Search Exchange Materials"
+                onChange={(e) => {
+                  debounceFn(e.target.value);
+                }}
                 startAdornment={(
                   <InputAdornment position="start">
                     <SvgIcon
@@ -223,6 +254,36 @@ const ExchangeMaterials = () => {
                 )}
                 sx={{ maxWidth: 500 }}
               />
+              <Select
+                  size={'large'}
+                  style={{
+                    width: 200
+                  }}
+                  placeholder="Select campaign"
+                  onChange={(value) => {
+                    if (!value) {
+                      setDataSearch({
+                        ...dataSearch,
+                        page: 0,
+                        postId: ''
+                      });
+                      return;
+                    }
+                    setDataSearch({
+                      ...dataSearch,
+                      postId: value
+                    });
+                  }}
+                  allowClear
+              >
+                {
+                  campaigns.map((campaign) => (
+                      <Select.Option key={campaign.id} value={campaign.id}>
+                        {campaign.name}
+                      </Select.Option>
+                  ))
+                }
+              </Select>
             </Card>
             <Card>
               <Scrollbar>

@@ -98,7 +98,7 @@ const Order = () => {
             title: 'Created At',
             dataIndex: 'createdAt',
             key: 'createdAt',
-            width: 70,
+            width: '10%',
             sorter: true,
             sortDirections: ['ascend', 'descend']
         },
@@ -185,20 +185,20 @@ const Order = () => {
                                 </Stack>
                             </Stack>
                             <div>
-                                <Button
-                                    onClick={() => {
-                                        // setOpenAddModal(true);
-                                        // setToEdit(null);
-                                    }}
-                                    startIcon={(
-                                        <SvgIcon fontSize="small">
-                                            <PlusIcon/>
-                                        </SvgIcon>
-                                    )}
-                                    variant="contained"
-                                >
-                                    Add
-                                </Button>
+                                {/*<Button*/}
+                                {/*    onClick={() => {*/}
+                                {/*        // setOpenAddModal(true);*/}
+                                {/*        // setToEdit(null);*/}
+                                {/*    }}*/}
+                                {/*    startIcon={(*/}
+                                {/*        <SvgIcon fontSize="small">*/}
+                                {/*            <PlusIcon/>*/}
+                                {/*        </SvgIcon>*/}
+                                {/*    )}*/}
+                                {/*    variant="contained"*/}
+                                {/*>*/}
+                                {/*    Add*/}
+                                {/*</Button>*/}
                             </div>
                         </Stack>
                         <Card style={{

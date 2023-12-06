@@ -19,7 +19,7 @@ import { Button as AntdButton, Image, Pagination, Popconfirm, Table } from 'antd
 import AddProductModal from '../sections/products/AddProductModal';
 import { useQuery } from 'react-query';
 import paperRecyclingApis from '../services/paperRecyclingApis';
-import { useMemo, useState } from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import { AiOutlineEdit, AiOutlineEye } from 'react-icons/ai';
 import { BsEyeFill, BsFillCheckCircleFill, BsFillTrashFill } from 'react-icons/bs';
 import AddOrEditCategoryModal from '../sections/categories/AddOrEditCategoryModal';
@@ -29,15 +29,21 @@ import AddOrEditCampaignModal from '../sections/campaigns/AddOrEditCampaignModal
 import { campaignStatus } from '../constants';
 import { formatCampaignStatus } from '../utils';
 import { ref } from 'yup';
+import _debounce from "lodash/debounce";
 
 const Campaigns = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [toEdit, setToEdit] = useState(null);
+  const [dataSearch, setDataSearch] = useState({
+    page: 0,
+    limit: 10,
+    q: '',
+  });
   const {
     data: campaignsData = {},
     isLoading: isLoadingCampaigns,
     refetch: refetchCampaigns
-  } = useQuery(['paperRecyclingApis.allPosts'], () => paperRecyclingApis.getAllCampaigns());
+  } = useQuery(['paperRecyclingApis.allPosts', dataSearch], ({queryKey}) => paperRecyclingApis.getAllCampaigns(queryKey[1]));
 
   const { data: { contents: campaigns = [] } = {} } = campaignsData;
   const tableData = useMemo(() => {
@@ -74,6 +80,14 @@ const Campaigns = () => {
     });
   };
 
+  const handeSearchDebounce = (value) => {
+    setDataSearch({
+      ...dataSearch,
+      q: value
+    });
+  };
+  const debounceFn = useCallback(_debounce(handeSearchDebounce, 500), [dataSearch]);
+
   const columns = useMemo(() => {
     return [
       {
@@ -105,6 +119,7 @@ const Campaigns = () => {
       {
         title: 'Description',
         dataIndex: 'description',
+        width: '30%',
         key: 'description',
         render: (description) => {
           return <div>{description?.length > 200
@@ -243,6 +258,9 @@ const Campaigns = () => {
                 defaultValue=""
                 fullWidth
                 placeholder="Search campaigns"
+                onChange={(e) => {
+                  debounceFn(e.target.value);
+                }}
                 startAdornment={(
                   <InputAdornment position="start">
                     <SvgIcon

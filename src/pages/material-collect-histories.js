@@ -151,7 +151,7 @@ const MaterialCollectHistories = () => {
       title: 'Campaign',
       dataIndex: 'campaignName',
       key: 'campaignName',
-      width: '15%'
+      width: '30%'
     },
     {
       title: 'Class',
@@ -236,9 +236,10 @@ const MaterialCollectHistories = () => {
                   <MdCancel color="red" size={19}/>
                 </AntdButton>
               </Popconfirm>
-            </> : <AntdButton>
-              <BsEyeFill size={16}/>
-            </AntdButton>
+            </> : <div></div>
+            //   <AntdButton>
+            //   <BsEyeFill size={16}/>
+            // </AntdButton>
           }
 
         </Stack>

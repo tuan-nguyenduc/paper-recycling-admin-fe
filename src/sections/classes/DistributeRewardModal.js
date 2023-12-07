@@ -11,7 +11,9 @@ const DistributeRewardModal = ({ open, setOpen, toDistribute, refetchClasses }) 
   const [loading, setLoading] = useState(false);
   const { data: studentData = {} } = useQuery({
     queryKey: ['allStudents', toDistribute], queryFn: () => paperRecyclingApis.allUsers({
-      schoolClassId: toDistribute?.id
+      schoolClassId: toDistribute?.id,
+      page: 0,
+      limit: 999999
     })
   });
   const { data: { contents: allStudents = [] } = {} } = studentData;

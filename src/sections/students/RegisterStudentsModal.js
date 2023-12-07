@@ -14,6 +14,9 @@ const RegisterStudentsModal = ({open, setOpen}) => {
         try {
             setIsLoadingRegister(true)
             const RegisterData = await paperRecyclingApis.registerStudents(values)
+            setOpen(false)
+            form.resetFields()
+
         } catch (err) {
             throw new Error(err.message)
         } finally {

@@ -24,6 +24,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const continueUrl = searchParams.get('continueUrl');
   const auth = useAuth();
+  const [isLogging, setIsLogging] = useState(false);
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -43,6 +44,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
+        setIsLogging(true)
         await auth.signIn(values.email, values.password);
         if (continueUrl) {
           router.push(continueUrl);
@@ -53,6 +55,8 @@ const Page = () => {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
+      } finally {
+        setIsLogging(false)
       }
     }
   });
@@ -175,8 +179,9 @@ const Page = () => {
                 sx={{ mt: 3 }}
                 type="submit"
                 variant="contained"
+                disabled={isLogging}
               >
-                Continue
+                {isLogging ? "Logging In..." : "Log In"}
               </Button>
 
 

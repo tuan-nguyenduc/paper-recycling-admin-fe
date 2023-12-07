@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types';
 import { TOKEN_KEY } from '../constants';
 import paperRecyclingApis from '../services/paperRecyclingApis';
+import toast from "react-hot-toast";
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -144,7 +145,7 @@ export const AuthProvider = (props) => {
         }
       });
     } catch (err) {
-      console.log('fetching user error: ', err);
+      throw new Error(err.message);
     }
   };
 

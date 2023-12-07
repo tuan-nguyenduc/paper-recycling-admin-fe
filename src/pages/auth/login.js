@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import toast from "react-hot-toast";
 
 const Page = () => {
   const router = useRouter();
@@ -52,6 +53,7 @@ const Page = () => {
         }
         router.push('/');
       } catch (err) {
+        toast.error(err.message)
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);

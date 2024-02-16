@@ -1,5 +1,5 @@
 // Remote URL
-export const API_URL = '//3.1.102.71:3000/api/v1';
+export const API_URL = 'http://3.1.102.71:3000/api/v1';
 
 // Local URL
 // export const API_URL = 'http://localhost:3001/api/v1';
